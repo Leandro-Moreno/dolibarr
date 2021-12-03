@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Caster\PdoCaster;
 use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
@@ -19,28 +18,28 @@ use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class PdoCasterTest extends TestCase
+class PdoCasterTest extends \PHPUnit_Framework_TestCase
 {
-	use VarDumperTestTrait;
+    use VarDumperTestTrait;
 
-	/**
-	 * @requires extension pdo_sqlite
-	 */
-	public function testCastPdo()
-	{
-		$pdo = new \PDO('sqlite::memory:');
-		$pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, array('PDOStatement', array($pdo)));
+    /**
+     * @requires extension pdo_sqlite
+     */
+    public function testCastPdo()
+    {
+        $pdo = new \PDO('sqlite::memory:');
+        $pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, array('PDOStatement', array($pdo)));
 
-		$cast = PdoCaster::castPdo($pdo, array(), new Stub(), false);
+        $cast = PdoCaster::castPdo($pdo, array(), new Stub(), false);
 
-		$this->assertInstanceOf('Symfony\Component\VarDumper\Caster\EnumStub', $cast["\0~\0attributes"]);
+        $this->assertInstanceOf('Symfony\Component\VarDumper\Caster\EnumStub', $cast["\0~\0attributes"]);
 
-		$attr = $cast["\0~\0attributes"] = $cast["\0~\0attributes"]->value;
-		$this->assertInstanceOf('Symfony\Component\VarDumper\Caster\ConstStub', $attr['CASE']);
-		$this->assertSame('NATURAL', $attr['CASE']->class);
-		$this->assertSame('BOTH', $attr['DEFAULT_FETCH_MODE']->class);
+        $attr = $cast["\0~\0attributes"] = $cast["\0~\0attributes"]->value;
+        $this->assertInstanceOf('Symfony\Component\VarDumper\Caster\ConstStub', $attr['CASE']);
+        $this->assertSame('NATURAL', $attr['CASE']->class);
+        $this->assertSame('BOTH', $attr['DEFAULT_FETCH_MODE']->class);
 
-		$xDump = <<<'EODUMP'
+        $xDump = <<<'EODUMP'
 array:2 [
   "\x00~\x00inTransaction" => false
   "\x00~\x00attributes" => array:9 [
@@ -59,6 +58,6 @@ array:2 [
 ]
 EODUMP;
 
-		$this->assertDumpMatchesFormat($xDump, $cast);
-	}
+        $this->assertDumpMatchesFormat($xDump, $cast);
+    }
 }
